@@ -62,8 +62,11 @@ const gameboard = (function () {
     return !(value || value.length);
   }
 
-  const clear = () => {
+  const restart = () => {
+    removeListeners();
+    addListeners();
     _gameboard = _gameboard.map(cell => '');
+    document.querySelector(".game-over").textContent='';
     flowControl.render();
   };
 
@@ -79,8 +82,10 @@ const gameboard = (function () {
       flowControl.render();
       if (isGameover(index)) {
         const text = document.createElement('p');
-        text.innerHTML = "Game over!";
-        document.body.appendChild(text);
+        text.setAttribute("class", "game-over");
+        text.textContent = "Game over!";
+        document.querySelector(".container").appendChild(text);
+        flowControl.exit();
       }
     }
   };
@@ -89,10 +94,17 @@ const gameboard = (function () {
     const cells = document.querySelectorAll(".cell");
     cells.forEach(cell => cell.addEventListener('click', setCell));
   };
+
+  const removeListeners = () => {
+    const cells = document.querySelectorAll(".cell");
+    cells.forEach(cell => cell.removeEventListener('click', setCell));
+  };
+
   return {
     getGameboard,
     addListeners,
-    clear
+    removeListeners,
+    restart
   }
 })();
 
@@ -114,7 +126,7 @@ const flowControl = (function () {
     const startBtn = document.querySelector(".start");
     startBtn.addEventListener('click', gameboard.addListeners);
     const restartBtn = document.querySelector(".restart");
-    restartBtn.addEventListener('click', gameboard.clear);
+    restartBtn.addEventListener('click', gameboard.restart);
   };
 
   const render = () => {
@@ -124,8 +136,13 @@ const flowControl = (function () {
     }
   }
 
+  const exit = () => {
+    gameboard.removeListeners();
+  };
+
   return {
     init,
+    exit,
     render
   }
 })();
