@@ -84,7 +84,7 @@ const gameboard = (function () {
         const text = document.createElement('p');
         text.setAttribute("class", "game-over");
         text.textContent = "Game over!";
-        document.querySelector(".container").appendChild(text);
+        document.querySelector(".text-container").appendChild(text);
         flowControl.exit();
       }
     }
