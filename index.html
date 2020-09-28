@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8">
     <link rel="stylesheet" href="styles/reset.css" type="text/css" media="screen" />
     <link rel="stylesheet" href="styles/main.css" type="text/css" media="screen" />
   </head>
@@ -11,25 +12,23 @@
 
       <h1>Tic-tac-toe</h1>
 
-      <form method="post" action="">
-        <ul>
-          <li>
-            <label for="p1">Player O</label>
-            <input type="text" id="p1" name="p1" placeholder="Enter name" />
-            <input type="checkbox" id="bot1" name="bot1" value="bot1">
-            <label for="bot1">Bot O</label>
-          </li>
-          <li>
-            <label for="p2">Player X</label>
-            <input type="text" id="p2" name="p2" placeholder="Enter name" />
-            <input type="checkbox" id="bot2" name="bot2" value="bot2">
-            <label for="bot2">Bot X</label>
-          </li>
-          <li>
-            <input type="submit" value="Start">
-          </li>
-        </ul>
-      </form>
+      <ul>
+        <li>
+          <label for="p1">Player O</label>
+          <input class="input" type="text" id="p1" name="p1" placeholder="Enter name" />
+          <input type="checkbox" id="bot1" name="bot1" value="bot1">
+          <label for="bot1">Bot O</label>
+        </li>
+        <li>
+          <label for="p2">Player X</label>
+          <input class="input" type="text" id="p2" name="p2" placeholder="Enter name" />
+          <input type="checkbox" id="bot2" name="bot2" value="bot2">
+          <label for="bot2">Bot X</label>
+        </li>
+        <li>
+          <input id="start-btn" type="submit" value="Start">
+        </li>
+      </ul>
 
       <div class="board">
       </div>

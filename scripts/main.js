@@ -145,6 +145,14 @@ const gameboard = (() => {
     cells.forEach(cell => cell.removeEventListener('click', flow.action));
   }
 
+  const clearBoard = () => {
+    const cells = document.querySelectorAll('.grid-item');
+    for (let i = 0; i < _boardArray.length; i++) {
+      _boardArray[i] = "";
+      cells[i].textContent = _boardArray[i];
+    }
+  }
+
   return {
     renderBoard,
     addListeners,
@@ -153,18 +161,77 @@ const gameboard = (() => {
     checkCol,
     checkDiags,
     isBoardFull,
-    removeListeners
+    removeListeners,
+    clearBoard
   }
 })();
 
 const flow = (() => {
   const init = () => {
-    gameboard.renderBoard();
+    _addMainListeners();
+  }
+
+  // initialize empty players
+  let _p1 = {};
+  let _p2 = {};
+
+  const _addMainListeners = () => {
+    const start = document.getElementById('start-btn');
+    start.addEventListener('click', _gameStart);
+    const botO = document.getElementById('bot1');
+    botO.addEventListener('click', toggleBot);
+    const botX = document.getElementById('bot2');
+    botX.addEventListener('click', toggleBot);
+  }
+
+  const toggleBot = (e) => {
+    if (e.target.checked) {
+      // blank out player name field
+      //
+    }
+  }
+
+  const _toggleStartRestart = (btn) => {
+    if (btn.id === "start-btn") {
+      btn.value = "Restart"
+      btn.id = "restart-btn"
+      btn.removeEventListener('click', _gameStart);
+      btn.addEventListener('click', _gameRestart);
+    } else if (btn.id === "restart-btn") {
+      btn.value = "Start"
+      btn.id = "start-btn"
+      btn.removeEventListener('click', _gameRestart);
+      btn.addEventListener('click', _gameStart);
+    }
+  }
+
+  const _toggleReadOnly = () => {
+    const inputFields = document.querySelectorAll('.input');
+    inputFields.forEach(input => input.readOnly = !(input.readOnly));
+  }
+
+  const _gameStart = () => {
+    // reset players
+    _p1 = Player(document.getElementById('p1').value, 'O', true);
+    _p2 = Player(document.getElementById('p2').value, 'X', false);
+    // blank out all input fields
+    _toggleReadOnly();
+    //  turn start into restart
+    const btn = document.getElementById('start-btn');
+    _toggleStartRestart(btn);
+    // start board cell listeners
     gameboard.addListeners();
   }
 
-  const _p1 = Player(document.getElementById('p1').value, 'O', true);
-  const _p2 = Player(document.getElementById('p2').value, 'X', false);
+  const _gameRestart = () => {
+    // clear the board
+    gameboard.clearBoard();
+    // change btn back to start
+    const btn = document.getElementById('restart-btn');
+    _toggleStartRestart(btn);
+    // unblank input fields
+    _toggleReadOnly();
+  }
 
   const action = (e) => {
     const index = Number(e.target.getAttribute('data-index'));
@@ -191,7 +258,6 @@ const flow = (() => {
       message.textContent = `${name} is the winner!`;
       document.body.appendChild(message);
     } else if (gameboard.isBoardFull()) {
-      console.log("tie");
       const message = document.createElement('div');
       message.textContent = `Tie!`;
       document.body.appendChild(message);
