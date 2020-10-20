@@ -15,45 +15,16 @@
 const Player = (name, role, next) => {
   const _name = name;
   const _role = role;
+  const _playerType = 'player';
   let _next = next;
 
   const getName = () => { return _name; };
   const getRole = () => { return _role; };
+  const getPlayerType = () => _playerType;
   const isNext = () => { return _next; };
   const toggleNext = () => { _next = !_next; };
 
-  const action = (e) => {
-    const index = Number(e.target.getAttribute('data-index'));
-
-    // check if the opponent is a bot at the end player's action
-
-    // update boardArray
-    gameboard.updateBoard(index, player.getRole());
-    // update player states
-    _p1.toggleNext();
-    _p2.toggleNext();
-
-    gameboard.renderBoard();
-
-    // if the game is over render game over message
-    if (player.isWinner(index)) {
-      gameboard.removeListeners();
-      let name = player.getName();
-      const message = document.createElement('div');
-      message.textContent = `${name} is the winner!`;
-      document.querySelector('.container').appendChild(message);
-    } else if (gameboard.isBoardFull()) {
-      const message = document.createElement('div');
-      message.textContent = `Tie!`;
-      document.querySelector('.container').appendChild(message);
-    } else if (_p1.isBot() || _p2.isBot()){
-      if (_p1.isNext()) {
-        player = _p1;
-      } else if (_p2.isNext()){
-        player = _p2;
-      }
-      _botAction(player);
-    }
+  const playerAction = (e) => {
   }
 
   const isWinner = (index) => {
@@ -73,18 +44,21 @@ const Player = (name, role, next) => {
     isNext,
     toggleNext,
     isWinner,
-    action
+    playerAction,
+    getPlayerType
   }
 };
 
 const Bot = (name, role, next) => {
   const prototype = Player(name, role, next);
-  const action = () => {
-    flow.botAction();
-  }
-  return Object.assign({}, prototype, {
+  const _playerType = 'bot';
+  const getPlayerType = () => _playerType;
 
-  });
+  // If bot goes first, then bot's action is called from flow
+  // if we just keep all the actions within the flow
+  // o/w bot gets called from player's turn listener
+
+  return Object.assign({}, prototype, { getPlayerType });
 };
 
 const gameboard = (() => {
@@ -109,7 +83,7 @@ const gameboard = (() => {
      * * render the new board
      * * check if the game is over or not
      */
-    cells.forEach(cell => cell.addEventListener('click', flow.playerAction));
+    cells.forEach(cell => cell.addEventListener('click', flow.action));
   }
 
   const updateBoard = (index, role) => {
@@ -122,6 +96,10 @@ const gameboard = (() => {
     } catch(err) {
       return err;
     }
+  }
+
+  const resetCell = (index) => {
+    _boardArray[index] = "";
   }
 
   const checkRow = (index) => {
@@ -218,7 +196,8 @@ const gameboard = (() => {
     isBoardFull,
     removeListeners,
     clearBoard,
-    indexEmpty
+    indexEmpty,
+    resetCell
   }
 })();
 
@@ -285,57 +264,105 @@ const flow = (() => {
     inputFields.forEach(input => input.readOnly = !(input.readOnly));
   }
 
-  const _minimax = (bot, index) => {
-    // input index, board
+  const _minimax = (index, currPlayer, nextPlayer, maximizer) => {
+    // determine if it's X's or O's turn
+
     // base case: max wins, tie, min wins = 1, 0, or -1
-    if (bot.isWinner(index)) {
-      return 1;
+    if (currPlayer.isWinner(index)) {
+      return (maximizer ? 1 : -1);
     }
-    else if (gameboard.isBoardFull()) {
+    if (gameboard.isBoardFull()) {
       return 0;
     }
-    // if it's a minimizer get the lowest score of its children
-    // // if scores aren't available, recurse into that node
-    // if it's a maximizer get the highest score of its children
-    // // if scores aren't available, recurse into that node
+      // if it's a minimizer get the lowest score of its children
+      // // if scores aren't available, recurse into that node
+      // if it's a maximizer get the highest score of its children
+      // // if scores aren't available, recurse into that node
+    if (maximizer) {
+      let bestScore = -Infinity;
+      for (let i = 0; i < 9; i++) {
+        if (gameboard.indexEmpty(i)) {
+          gameboard.updateBoard(i, currPlayer.getRole());
+          let score = _minimax(i, nextPlayer, currPlayer, false);
+          gameboard.resetCell(i);
+          bestScore = Math.max(bestScore, score);
+        }
+      }
+      return bestScore;
+    } else {
+      let bestScore = Infinity;
+      for (let i = 0; i < 9; i++) {
+        if (gameboard.indexEmpty(i)) {
+          gameboard.updateBoard(i, currPlayer.getRole());
+          let score = _minimax(i, nextPlayer, currPlayer, true);
+          gameboard.resetCell(i);
+          bestScore = Math.min(bestScore, score);
+        }
+      }
+      return bestScore;
+    }
   }
 
-  const botAction = (bot) => {
-    // tick a random cell that isn't already taken
-    let index = Math.floor(Math.random()*9);
-    while (!gameboard.indexEmpty(index)) {
-      index = Math.floor(Math.random()*9);
-    }
+  const botAction = () => {
 
+    let currPlayer = {};
+    let nextPlayer = {};
+    if (_p1.isNext()) {
+      currPlayer = _p1;
+      nextPlayer = _p2;
+    } else if (_p2.isNext()){
+      currPlayer = _p2;
+      nextPlayer = _p1;
+    }
+    // tick a random cell that isn't already taken
+    // while there are still indices to check, call minimax on them
     // go through each empty index
     // get the minimax score of each
     let bestScore = -Infinity;
+    let index = -1;
     for (let i = 0; i < 9; i++) {
       if (gameboard.indexEmpty(i)) {
-        let score = minimax();
-
+        console.log('index', i);
+        gameboard.updateBoard(i, currPlayer.getRole());
+        let score = _minimax(i, currPlayer, nextPlayer, false);
+        gameboard.resetCell(i);
+        console.log(score);
+        if (score > bestScore) {
+          bestScore = score;
+          index = i;
+        }
       }
     }
-    gameboard.updateBoard(index, bot.getRole());
+
+    gameboard.updateBoard(index, currPlayer.getRole());
     // toggle next on both players
     _p1.toggleNext();
     _p2.toggleNext();
+    // if (currPlayer.isNext()) {
+    //   currPlayer.toggleNext();
+    // }
+    // if (!nextPlayer.isNext()) {
+    //   nextPlayer.toggleNext();
+    // }
 
     gameboard.renderBoard();
 
     // if the game is over render game over message
-    if (bot.isWinner(index)) {
+    // TODO: Put these into functions for something like
+    // if (gameOver)
+    // render game over
+    if (currPlayer.isWinner(index)) {
       gameboard.removeListeners();
-      let name = bot.getName();
+      let name = currPlayer.getName();
       const message = document.createElement('div');
       message.textContent = `${name} is the winner!`;
       document.querySelector('.container').appendChild(message);
     } else if (gameboard.isBoardFull()) {
+      gameboard.removeListeners();
       const message = document.createElement('div');
       message.textContent = `Tie!`;
       document.querySelector('.container').appendChild(message);
     }
-
   }
 
   const _gameStart = () => {
@@ -346,11 +373,9 @@ const flow = (() => {
     const btn = document.getElementById('start-btn');
     _toggleStartRestart(btn);
 
-    // reset players
+    // set players
     if (document.getElementById('bot1').checked) {
       _p1 = Bot(document.getElementById('p1').value, 'O', true);
-      // if _p1 is a bot, then start the bot
-      _p1.action();
     } else {
       _p1 = Player(document.getElementById('p1').value, 'O', true);
     }
@@ -358,6 +383,9 @@ const flow = (() => {
       _p2 = Bot(document.getElementById('p2').value, 'X', false);
     } else {
       _p2 = Player(document.getElementById('p2').value, 'X', false);
+    }
+    if (_p1.getPlayerType() === 'bot') {
+      botAction();
     }
 
     // start board cell listeners
@@ -375,32 +403,45 @@ const flow = (() => {
     gameboard.removeListeners();
   }
 
-  const playerAction = (e) => {
+  const action = (e) => {
     const index = Number(e.target.getAttribute('data-index'));
-
-    // bot always goes right after real player goes
-    // check if the opponent is a bot at the end player's action
-
-    // listener invokes flow.action
-
-    let player = {};
+    // flow.action is called from the cells event listener
+    // flow.action differentiates between a player and a bot
+    // the problem lies in the player calling the bot action
+    // so flow.action should handle that logic
+    // flow.action {
+    //    check who's next
+    let currPlayer = {};
+    let nextPlayer = {};
     if (_p1.isNext()) {
-      player = _p1;
+      currPlayer = _p1;
+      nextPlayer = _p2;
     } else if (_p2.isNext()){
-      player = _p2;
+      currPlayer = _p2;
+      nextPlayer = _p1;
     }
-    // player.action(e);
+
+    _playerAction(index, currPlayer, nextPlayer);
+    //    we know that the one that's next is a player
+    //    we need to check if the other one is a bot or a player
+    //    if it's a player do nothing. If it's a bot, call bot.action
+    //    check by calling the function botAction
+    // }
+  };
+
+  const _playerAction = (index, player, nextPlayer) => {
+
     // update boardArray
     gameboard.updateBoard(index, player.getRole());
-    // update player states
-    _p1.toggleNext();
-    _p2.toggleNext();
+    // toggle next on both players
+    if (player.isNext()) {
+      player.toggleNext();
+    }
+    if (!nextPlayer.isNext()) {
+      nextPlayer.toggleNext();
+    }
 
     gameboard.renderBoard();
-
-    // cell event listener calls player action
-    // player action calls bot action if the next player is a bot
-    // if it's not a bot, nothing happens
 
     // if the game is over render game over message
     if (player.isWinner(index)) {
@@ -413,24 +454,18 @@ const flow = (() => {
       const message = document.createElement('div');
       message.textContent = `Tie!`;
       document.querySelector('.container').appendChild(message);
-    } else {
-      // if the next turn is a bot's turn, then call bot action
-      // instead of using isBot, just call action on player
-      if (_p1.isNext()) {
-        player = _p1;
-      } else if (_p2.isNext()){
-        player = _p2;
-      }
-      if (player.isBot()) {
-        _botAction(player);
-      }
     }
-  }
+    // if it's not a bot, nothing happens
+    if (nextPlayer.getPlayerType() === 'bot') {
+      console.log('bot action');
+      botAction();
+    }
+  };
 
   return {
     init,
-    playerAction,
-    botAction
+    botAction,
+    action
   }
 })();
 
