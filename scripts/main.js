@@ -69,6 +69,8 @@ const gameboard = (() => {
     "","",""
   ];
 
+  const getBoard = () => _boardArray;
+
   const renderBoard = () => {
     const cells = document.querySelectorAll('.grid-item');
     for (let i = 0; i < _boardArray.length; i++) {
@@ -197,7 +199,8 @@ const gameboard = (() => {
     removeListeners,
     clearBoard,
     indexEmpty,
-    resetCell
+    resetCell,
+    getBoard
   }
 })();
 
@@ -264,107 +267,6 @@ const flow = (() => {
     inputFields.forEach(input => input.readOnly = !(input.readOnly));
   }
 
-  const _minimax = (index, currPlayer, nextPlayer, maximizer) => {
-    // determine if it's X's or O's turn
-
-    // base case: max wins, tie, min wins = 1, 0, or -1
-    if (currPlayer.isWinner(index)) {
-      return (maximizer ? 1 : -1);
-    }
-    if (gameboard.isBoardFull()) {
-      return 0;
-    }
-      // if it's a minimizer get the lowest score of its children
-      // // if scores aren't available, recurse into that node
-      // if it's a maximizer get the highest score of its children
-      // // if scores aren't available, recurse into that node
-    if (maximizer) {
-      let bestScore = -Infinity;
-      for (let i = 0; i < 9; i++) {
-        if (gameboard.indexEmpty(i)) {
-          gameboard.updateBoard(i, currPlayer.getRole());
-          let score = _minimax(i, nextPlayer, currPlayer, false);
-          gameboard.resetCell(i);
-          bestScore = Math.max(bestScore, score);
-        }
-      }
-      return bestScore;
-    } else {
-      let bestScore = Infinity;
-      for (let i = 0; i < 9; i++) {
-        if (gameboard.indexEmpty(i)) {
-          gameboard.updateBoard(i, currPlayer.getRole());
-          let score = _minimax(i, nextPlayer, currPlayer, true);
-          gameboard.resetCell(i);
-          bestScore = Math.min(bestScore, score);
-        }
-      }
-      return bestScore;
-    }
-  }
-
-  const botAction = () => {
-
-    let currPlayer = {};
-    let nextPlayer = {};
-    if (_p1.isNext()) {
-      currPlayer = _p1;
-      nextPlayer = _p2;
-    } else if (_p2.isNext()){
-      currPlayer = _p2;
-      nextPlayer = _p1;
-    }
-    // tick a random cell that isn't already taken
-    // while there are still indices to check, call minimax on them
-    // go through each empty index
-    // get the minimax score of each
-    let bestScore = -Infinity;
-    let index = -1;
-    for (let i = 0; i < 9; i++) {
-      if (gameboard.indexEmpty(i)) {
-        console.log('index', i);
-        gameboard.updateBoard(i, currPlayer.getRole());
-        let score = _minimax(i, currPlayer, nextPlayer, false);
-        gameboard.resetCell(i);
-        console.log(score);
-        if (score > bestScore) {
-          bestScore = score;
-          index = i;
-        }
-      }
-    }
-
-    gameboard.updateBoard(index, currPlayer.getRole());
-    // toggle next on both players
-    _p1.toggleNext();
-    _p2.toggleNext();
-    // if (currPlayer.isNext()) {
-    //   currPlayer.toggleNext();
-    // }
-    // if (!nextPlayer.isNext()) {
-    //   nextPlayer.toggleNext();
-    // }
-
-    gameboard.renderBoard();
-
-    // if the game is over render game over message
-    // TODO: Put these into functions for something like
-    // if (gameOver)
-    // render game over
-    if (currPlayer.isWinner(index)) {
-      gameboard.removeListeners();
-      let name = currPlayer.getName();
-      const message = document.createElement('div');
-      message.textContent = `${name} is the winner!`;
-      document.querySelector('.container').appendChild(message);
-    } else if (gameboard.isBoardFull()) {
-      gameboard.removeListeners();
-      const message = document.createElement('div');
-      message.textContent = `Tie!`;
-      document.querySelector('.container').appendChild(message);
-    }
-  }
-
   const _gameStart = () => {
 
     // blank out all input fields
@@ -385,7 +287,7 @@ const flow = (() => {
       _p2 = Player(document.getElementById('p2').value, 'X', false);
     }
     if (_p1.getPlayerType() === 'bot') {
-      botAction();
+      botAction(_p1, _p2);
     }
 
     // start board cell listeners
@@ -409,8 +311,6 @@ const flow = (() => {
     // flow.action differentiates between a player and a bot
     // the problem lies in the player calling the bot action
     // so flow.action should handle that logic
-    // flow.action {
-    //    check who's next
     let currPlayer = {};
     let nextPlayer = {};
     if (_p1.isNext()) {
@@ -429,6 +329,21 @@ const flow = (() => {
     // }
   };
 
+  const showWinner = (player) => {
+    gameboard.removeListeners();
+    let name = player.getName();
+    const message = document.createElement('div');
+    message.textContent = `${name} is the winner!`;
+    document.querySelector('.container').appendChild(message);
+  }
+
+  const showTie = () => {
+    gameboard.removeListeners();
+    const message = document.createElement('div');
+    message.textContent = `Tie!`;
+    document.querySelector('.container').appendChild(message);
+  }
+
   const _playerAction = (index, player, nextPlayer) => {
 
     // update boardArray
@@ -445,26 +360,99 @@ const flow = (() => {
 
     // if the game is over render game over message
     if (player.isWinner(index)) {
-      gameboard.removeListeners();
-      let name = player.getName();
-      const message = document.createElement('div');
-      message.textContent = `${name} is the winner!`;
-      document.querySelector('.container').appendChild(message);
+      showWinner(player);
     } else if (gameboard.isBoardFull()) {
-      const message = document.createElement('div');
-      message.textContent = `Tie!`;
-      document.querySelector('.container').appendChild(message);
-    }
-    // if it's not a bot, nothing happens
-    if (nextPlayer.getPlayerType() === 'bot') {
-      console.log('bot action');
-      botAction();
+      showTie();
+    } else if (nextPlayer.getPlayerType() === 'bot') {
+      botAction(nextPlayer, player);
     }
   };
 
+  // botAction will generally be called from playerAction
+  // with the exception of the bot going first,
+  // in which case it's called from gameSTart
+
+  // What are all the things botAction needs to do?
+  // determine the best cell for its turn
+  // update the board with that cell and render
+  // input: 
+  // output: none - just the render
+
+  //player action calls botAction
+  const botAction = (bot, human) => {
+    let bestScore = -Infinity;
+    let index = null;
+    // loop through each index in the board
+    for (let i = 0; i < 9; i++) {
+      // check if the cell is empty
+      if (gameboard.indexEmpty(i)) {
+        // fill the cell with the correct role
+        gameboard.updateBoard(i, bot.getRole());
+        // call minimax to get the score of each index
+        let score = minimax(i, human, bot, false);
+        console.log(i, score);
+        // reset the cell
+        gameboard.resetCell(i);
+        // store the best score of those scores as well as its index
+        if (score > bestScore) {
+          bestScore = score;
+          index = i;
+        }
+      }
+    }
+    // use the new index to fill the corresponding cell
+    gameboard.updateBoard(index, bot.getRole());
+
+    // render the board
+    gameboard.renderBoard();
+    
+    // toggle who's next
+    _p1.toggleNext();
+    _p2.toggleNext();
+
+    if (bot.isWinner(index)) {
+      showWinner(bot);
+    } else if (gameboard.isBoardFull()) {
+      showTie();
+    }
+  }
+
+  const minimax = (index, currPlayer, nextPlayer, maximizing) => {
+    // base cases
+    //console.log(currPlayer.getRole(), maximizing);
+    if (currPlayer.isWinner(index)) {
+      return maximizing ? -1 : 1;
+    } else if (gameboard.isBoardFull()) {
+      return 0;
+    }
+
+    if (maximizing) {
+      let bestScore = -Infinity;
+      for (let i = 0; i < 9; i++) {
+        if (gameboard.indexEmpty(i)) {
+          gameboard.updateBoard(i, currPlayer.getRole());
+          let score = minimax(i, nextPlayer, currPlayer, false);
+          gameboard.resetCell(i);
+          bestScore = Math.max(score, bestScore);
+        }
+      }
+      return bestScore;
+    } else {
+      let bestScore = Infinity;
+      for (let i = 0; i < 9; i++) {
+        if (gameboard.indexEmpty(i)) {
+          gameboard.updateBoard(i, currPlayer.getRole());
+          let score = minimax(i, nextPlayer, currPlayer, true);
+          gameboard.resetCell(i);
+          bestScore = Math.min(score, bestScore);
+        }
+      }
+      return bestScore;
+    }
+  }
+
   return {
     init,
-    botAction,
     action
   }
 })();
