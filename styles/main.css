@@ -11,8 +11,16 @@ h1 {
     margin: 0 auto;
 }
 
+.name-menu-multi, 
+.name-menu, 
+.role-menu, 
+#restart-btn, 
+#new-game-btn {
+    display: none;
+}
+
 .board {
-    display: grid;
+    display: none;
     grid-template-columns: repeat(3, 150px);
     grid-template-rows: repeat(3, 150px)
 }

@@ -8,30 +8,44 @@
 
   <body>
 
+    <header>
+      <h1>Tic-tac-toe</h1>
+    </header>
+
     <div class="container">
 
-      <h1>Tic-tac-toe</h1>
+      <div class="main-menu">
+        <button type="button" id="single-btn">Single player</button>
+        <button type="button" id="multi-btn">Multi player</button>
+      </div>
 
-      <ul>
-        <li>
-          <label for="p1">Player O</label>
-          <input class="input" type="text" id="p1" name="p1" placeholder="Enter name" />
-          <input type="checkbox" id="bot1" name="bot1" value="bot1">
-          <label for="bot1">Bot O</label>
-        </li>
-        <li>
-          <label for="p2">Player X</label>
-          <input class="input" type="text" id="p2" name="p2" placeholder="Enter name" />
-          <input type="checkbox" id="bot2" name="bot2" value="bot2">
-          <label for="bot2">Bot X</label>
-        </li>
-        <li>
-          <input id="start-btn" type="submit" value="Start">
-        </li>
-      </ul>
+      <div class="name-menu">
+        <label for="name">Name: </label>
+        <input id="name" type="text" name="name" placeholder="Enter name">
+        <button id="continue-btn">Continue</button>
+      </div>
+
+      <div class="name-menu-multi">
+        <label for="p1">Name for X: </label>
+        <input id="p1" type="text" name="p1" placeholder="Enter name for X">
+        <label for="p2">Name for O: </label>
+        <input id="p2" type="text" name="p2" placeholder="Enter name for O">
+        <button id="begin-btn">Begin</button>
+      </div>
+
+      <div class="role-menu">
+        <p>Enter your role</p>
+        <button id="xrole">X</button>
+        <button id="orole">O</button>
+      </div>
 
       <div class="board">
       </div>
+
+      <p id="gg-message"></p>
+
+      <button type="button" id="restart-btn">Rematch</button>
+      <button type="button" id="new-game-btn">New game</button>
 
     </div>
 

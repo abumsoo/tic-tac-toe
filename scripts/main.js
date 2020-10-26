@@ -1,6 +1,4 @@
-// TODO: Bot/player organization. Is bot a subclass of player?
-// TODO: AI logic - minimax
-// draw the board
+  // draw the board
 (function() {
   const board = document.querySelector('.board');
   for (let i = 0; i < 9; i++) {
@@ -24,9 +22,6 @@ const Player = (name, role, next) => {
   const isNext = () => { return _next; };
   const toggleNext = () => { _next = !_next; };
 
-  const playerAction = (e) => {
-  }
-
   const isWinner = (index) => {
     return (
       // check row
@@ -44,7 +39,6 @@ const Player = (name, role, next) => {
     isNext,
     toggleNext,
     isWinner,
-    playerAction,
     getPlayerType
   }
 };
@@ -89,15 +83,7 @@ const gameboard = (() => {
   }
 
   const updateBoard = (index, role) => {
-    try {
-      if (_boardArray[index] === "") {
-        _boardArray[index] = role;
-      } else {
-        throw "That cell already has a value";
-      }
-    } catch(err) {
-      return err;
-    }
+    _boardArray[index] = role;
   }
 
   const resetCell = (index) => {
@@ -214,103 +200,75 @@ const flow = (() => {
   let _p2 = {};
 
   const _addMainListeners = () => {
-    const start = document.getElementById('start-btn');
-    start.addEventListener('click', _gameStart);
-    const botO = document.getElementById('bot1');
-    botO.addEventListener('click', toggleBot);
-    const botX = document.getElementById('bot2');
-    botX.addEventListener('click', toggleBot);
+    const singlePlayerBtn = document.getElementById('single-btn');
+    singlePlayerBtn.addEventListener('click', startSinglePlayer);
+    const multiPlayerBtn = document.getElementById('multi-btn');
+    multiPlayerBtn.addEventListener('click', startMultiPlayer);
   }
 
-  const toggleBot = (e) => {
-    if (e.target.checked) {
-      if (e.target.id === 'bot1') {
-        const p1Field = document.querySelector('#p1');
-        p1Field.value = 'Bot O'
-        p1Field.readOnly = true;
-      } else {
-        const p2Field = document.querySelector('#p2');
-        p2Field.value = 'Bot X'
-        p2Field.readOnly = true;
-      }
-      // blank out player name field
-      //
-    } else {
-      if (e.target.id === 'bot1') {
-        const p1Field = document.querySelector('#p1');
-        p1Field.value = ''
-        p1Field.readOnly = false;
-      } else {
-        const p2Field = document.querySelector('#p2');
-        p2Field.value = ''
-        p2Field.readOnly = false;
-      }
-    }
+  const startMultiPlayer = () => {
+    document.querySelector(".main-menu").style.display = "none";
+    document.querySelector(".name-menu-multi").style.display = "block";
+    const p1 = document.getElementById("p1");
+    const p2 = document.getElementById("p2");
+    const beginBtn = document.getElementById('begin-btn');
+    beginBtn.addEventListener('click', () => {
+      p1.readOnly = true;
+      p2.readOnly = true;
+      _p1 = Player(p1.value, "X", true);
+      _p2 = Player(p2.value, "O", false);
+      _startGame();
+    });
   }
 
-  const _toggleStartRestart = (btn) => {
-    if (btn.id === "start-btn") {
-      btn.value = "Restart"
-      btn.id = "restart-btn"
-      btn.removeEventListener('click', _gameStart);
-      btn.addEventListener('click', _gameRestart);
-    } else if (btn.id === "restart-btn") {
-      btn.value = "Start"
-      btn.id = "start-btn"
-      btn.removeEventListener('click', _gameRestart);
-      btn.addEventListener('click', _gameStart);
-    }
+  const startSinglePlayer = () => {
+    const mainMenu = document.querySelector(".main-menu");
+    mainMenu.style.display = "none";
+    document.querySelector(".name-menu").style.display = "block";
+    const nameInput = document.getElementById("name");
+    const continueBtn = document.getElementById('continue-btn');
+    continueBtn.addEventListener('click', () => {
+      // set _p1 data values
+      roleSelect(nameInput.value);
+    });
   }
 
-  const _toggleReadOnly = () => {
-    const inputFields = document.querySelectorAll('.input');
-    inputFields.forEach(input => input.readOnly = !(input.readOnly));
+  const roleSelect = (name) => {
+    document.querySelector(".name-menu").style.display = "none";
+    document.querySelector(".role-menu").style.display = "block";
+    const x = document.getElementById("xrole");
+    x.addEventListener('click', () => {
+      _p1 = Player(name, "X", true);
+      _p2 = Bot("ai", "O", false);
+      _startGame();
+    });
+    const o = document.getElementById("orole");
+    o.addEventListener('click', () => {
+      _p1 = Bot("ai", "X", true);
+      _p2 = Player(name, "O", false);
+      _startGame();
+    });
   }
 
-  const _gameStart = () => {
-
-    // blank out all input fields
-    _toggleReadOnly();
-    //  turn start into restart
-    const btn = document.getElementById('start-btn');
-    _toggleStartRestart(btn);
+  const _startGame = () => {
+    document.querySelector(".role-menu").style.display = "none";
+    const board = document.querySelector(".board");
+    board.style.display = "grid";
 
     // set players
-    if (document.getElementById('bot1').checked) {
-      _p1 = Bot(document.getElementById('p1').value, 'O', true);
-    } else {
-      _p1 = Player(document.getElementById('p1').value, 'O', true);
-    }
-    if (document.getElementById('bot2').checked) {
-      _p2 = Bot(document.getElementById('p2').value, 'X', false);
-    } else {
-      _p2 = Player(document.getElementById('p2').value, 'X', false);
-    }
     if (_p1.getPlayerType() === 'bot') {
-      botAction(_p1, _p2);
+      gameboard.removeListeners();
+      setTimeout(botAction, 650, _p1, _p2);
+    } else {
+      // start board cell listeners
+      gameboard.addListeners();
     }
 
-    // start board cell listeners
-    gameboard.addListeners();
   }
 
-  const _gameRestart = () => {
-    // clear the board
-    gameboard.clearBoard();
-    // change btn back to start
-    const btn = document.getElementById('restart-btn');
-    _toggleStartRestart(btn);
-    // unblank input fields
-    _toggleReadOnly();
-    gameboard.removeListeners();
-  }
 
   const action = (e) => {
     const index = Number(e.target.getAttribute('data-index'));
-    // flow.action is called from the cells event listener
-    // flow.action differentiates between a player and a bot
-    // the problem lies in the player calling the bot action
-    // so flow.action should handle that logic
     let currPlayer = {};
     let nextPlayer = {};
     if (_p1.isNext()) {
@@ -322,32 +280,45 @@ const flow = (() => {
     }
 
     _playerAction(index, currPlayer, nextPlayer);
-    //    we know that the one that's next is a player
-    //    we need to check if the other one is a bot or a player
-    //    if it's a player do nothing. If it's a bot, call bot.action
-    //    check by calling the function botAction
-    // }
   };
 
   const showWinner = (player) => {
     gameboard.removeListeners();
     let name = player.getName();
-    const message = document.createElement('div');
+    const message = document.getElementById("gg-message");
     message.textContent = `${name} is the winner!`;
-    document.querySelector('.container').appendChild(message);
   }
 
   const showTie = () => {
     gameboard.removeListeners();
-    const message = document.createElement('div');
-    message.textContent = `Tie!`;
-    document.querySelector('.container').appendChild(message);
+    const message = document.getElementById("gg-message");
+    message.textContent = "Tie!";
+  }
+
+  const restartGame = () => {
+    // moving draw board stuff
+    // clear the board
+    gameboard.clearBoard();
+    toggleRestartBtn();
+    toggleNewGameBtn();
+
+    if (_p1.getPlayerType() === 'bot') {
+      gameboard.removeListeners();
+      setTimeout(botAction, 650, _p1, _p2);
+    } else {
+      gameboard.addListeners();
+    }
+
   }
 
   const _playerAction = (index, player, nextPlayer) => {
 
     // update boardArray
-    gameboard.updateBoard(index, player.getRole());
+    if (gameboard.indexEmpty(index)) {
+      gameboard.updateBoard(index, player.getRole());
+    } else {
+      return;
+    }
     // toggle next on both players
     if (player.isNext()) {
       player.toggleNext();
@@ -360,48 +331,99 @@ const flow = (() => {
 
     // if the game is over render game over message
     if (player.isWinner(index)) {
+      if (!_p1.isNext()) {
+        _p1.toggleNext();
+      }
+      if (_p2.isNext()) {
+        _p2.toggleNext();
+      }
       showWinner(player);
+      toggleRestartBtn();
+      toggleNewGameBtn();
     } else if (gameboard.isBoardFull()) {
+      if (!_p1.isNext()) {
+        _p1.toggleNext();
+      }
+      if (_p2.isNext()) {
+        _p2.toggleNext();
+      }
       showTie();
+      toggleRestartBtn();
+      toggleNewGameBtn();
     } else if (nextPlayer.getPlayerType() === 'bot') {
-      botAction(nextPlayer, player);
+      gameboard.removeListeners();
+      setTimeout(botAction, 650, nextPlayer, player);
     }
   };
 
-  // botAction will generally be called from playerAction
-  // with the exception of the bot going first,
-  // in which case it's called from gameSTart
+  const toggleRestartBtn = () => {
+      const restartBtn = document.getElementById("restart-btn");
+      if (restartBtn.style.display == "block") {
+        restartBtn.style.display = "none";
+        restartBtn.removeEventListener('click', restartGame);
+      } else {
+        restartBtn.style.display = "block";
+        restartBtn.addEventListener('click', restartGame);
+      }
+  }
 
-  // What are all the things botAction needs to do?
-  // determine the best cell for its turn
-  // update the board with that cell and render
-  // input: 
-  // output: none - just the render
+  const toggleNewGameBtn = () => {
+      const newGameBtn = document.getElementById("new-game-btn");
+      if (newGameBtn.style.display == "block") {
+        newGameBtn.style.display = "none";
+        newGameBtn.removeEventListener('click', startNewGame);
+      } else {
+        newGameBtn.style.display = "block";
+        newGameBtn.addEventListener('click', startNewGame);
+      }
+  }
+
+  const startNewGame = () => {
+    gameboard.clearBoard();
+    gameboard.removeListeners();
+    toggleRestartBtn();
+    toggleNewGameBtn();
+    document.getElementById('gg-message').innerText = "";
+    document.getElementById('p1').value = "";
+    document.getElementById('p1').readOnly = false;
+    document.getElementById('p2').value = "";
+    document.getElementById('p2').readOnly = false;
+    document.getElementById('name').value = "";
+    document.querySelector('.name-menu-multi').style.display = "none";
+    document.querySelector('.board').style.display = "none";
+    document.querySelector('.main-menu').style.display = "block";
+  };
 
   //player action calls botAction
   const botAction = (bot, human) => {
     let bestScore = -Infinity;
+    let moveIndex = null;
     let index = null;
+    let indexHash = {};
     // loop through each index in the board
-    for (let i = 0; i < 9; i++) {
-      // check if the cell is empty
-      if (gameboard.indexEmpty(i)) {
-        // fill the cell with the correct role
-        gameboard.updateBoard(i, bot.getRole());
-        // call minimax to get the score of each index
-        let score = minimax(i, human, bot, false);
-        console.log(i, score);
-        // reset the cell
-        gameboard.resetCell(i);
-        // store the best score of those scores as well as its index
-        if (score > bestScore) {
-          bestScore = score;
-          index = i;
+    do {
+      index = Math.floor(Math.random()*9);
+      if (!(index in indexHash)) {
+        // check if the cell is empty
+        if (gameboard.indexEmpty(index)) {
+          // fill the cell with the correct role
+          gameboard.updateBoard(index, bot.getRole());
+          // call minimax to get the score of each index
+          let score = minimax(index, human, bot, false);
+          // reset the cell
+          gameboard.resetCell(index);
+          // store the best score of those scores as well as its index
+          if (score > bestScore) {
+            bestScore = score;
+            moveIndex = index;
+          }
         }
+        indexHash[index] = 0;
       }
-    }
+    } while (Object.keys(indexHash).length < 9);
+
     // use the new index to fill the corresponding cell
-    gameboard.updateBoard(index, bot.getRole());
+    gameboard.updateBoard(moveIndex, bot.getRole());
 
     // render the board
     gameboard.renderBoard();
@@ -410,16 +432,33 @@ const flow = (() => {
     _p1.toggleNext();
     _p2.toggleNext();
 
-    if (bot.isWinner(index)) {
+    if (bot.isWinner(moveIndex)) {
+      if (!_p1.isNext()) {
+        _p1.toggleNext();
+      }
+      if (_p2.isNext()) {
+        _p2.toggleNext();
+      }
       showWinner(bot);
+      toggleRestartBtn();
+      toggleNewGameBtn();
     } else if (gameboard.isBoardFull()) {
+      if (!_p1.isNext()) {
+        _p1.toggleNext();
+      }
+      if (_p2.isNext()) {
+        _p2.toggleNext();
+      }
       showTie();
+      toggleRestartBtn();
+      toggleNewGameBtn();
+    } else {
+      gameboard.addListeners();
     }
   }
 
   const minimax = (index, currPlayer, nextPlayer, maximizing) => {
     // base cases
-    //console.log(currPlayer.getRole(), maximizing);
     if (currPlayer.isWinner(index)) {
       return maximizing ? -1 : 1;
     } else if (gameboard.isBoardFull()) {
