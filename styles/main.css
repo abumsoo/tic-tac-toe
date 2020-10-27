@@ -1,4 +1,5 @@
 body {
+    font-family: Roboto;
     font-size: 16px;
 }
 
@@ -6,9 +7,47 @@ h1 {
     font-size: 3rem;
 }
 
+header {
+    margin-top: 5vh;
+    margin-bottom: 3vh;
+    text-align: center;
+}
+
 .container {
-    width: 1080px;
+    max-width: 1080px;
     margin: 0 auto;
+    text-align: center;
+}
+
+label {
+    align-self: flex-start;
+    font-size: 1.1rem;
+}
+
+input {
+    width: 92%;
+    height: 5vh;
+    border: 2px solid black;
+    border-radius: 4px;
+    margin: 8px 0;
+    padding: 1rem;
+    font-size: 1.5rem;
+    box-shadow: 0 2px 4px 2px rgba(0,0,0,0.2);
+}
+
+button {
+    width: 100%;
+    height: 10vh;
+    margin: 8px 0;
+    border: 2px solid black;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px 2px rgba(0,0,0,0.2);
+}
+
+button:hover {
+    cursor: pointer;
+    background: #e0e0e0;
+    box-shadow: 0 2px 4px 2px rgba(0,0,0,0.5);
 }
 
 .name-menu-multi, 
@@ -19,10 +58,28 @@ h1 {
     display: none;
 }
 
+#restart-btn, #new-game-btn {
+    width: 20%;
+}
+
+.main-menu {
+    margin: 0 auto;
+    width: 50%;
+}
+
+.name-menu-multi, .name-menu, .role-menu {
+    width: 50%;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
+}
+
 .board {
     display: none;
     grid-template-columns: repeat(3, 150px);
-    grid-template-rows: repeat(3, 150px)
+    grid-template-rows: repeat(3, 150px);
+    max-width: 450px;
+    margin: 0 auto;
 }
 
 .grid-item {
@@ -50,4 +107,9 @@ h1 {
 .grid-item[data-index="5"] {
     border-left: none;
     border-right: none;
+}
+
+#gg-message {
+    font-size: 1.1rem;
+    padding: 8px 0;
 }

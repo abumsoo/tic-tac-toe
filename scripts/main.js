@@ -208,7 +208,7 @@ const flow = (() => {
 
   const startMultiPlayer = () => {
     document.querySelector(".main-menu").style.display = "none";
-    document.querySelector(".name-menu-multi").style.display = "block";
+    document.querySelector(".name-menu-multi").style.display = "flex";
     const p1 = document.getElementById("p1");
     const p2 = document.getElementById("p2");
     const beginBtn = document.getElementById('begin-btn');
@@ -224,7 +224,7 @@ const flow = (() => {
   const startSinglePlayer = () => {
     const mainMenu = document.querySelector(".main-menu");
     mainMenu.style.display = "none";
-    document.querySelector(".name-menu").style.display = "block";
+    document.querySelector(".name-menu").style.display = "flex";
     const nameInput = document.getElementById("name");
     const continueBtn = document.getElementById('continue-btn');
     continueBtn.addEventListener('click', () => {
@@ -235,7 +235,7 @@ const flow = (() => {
 
   const roleSelect = (name) => {
     document.querySelector(".name-menu").style.display = "none";
-    document.querySelector(".role-menu").style.display = "block";
+    document.querySelector(".role-menu").style.display = "flex";
     const x = document.getElementById("xrole");
     x.addEventListener('click', () => {
       _p1 = Player(name, "X", true);
@@ -358,22 +358,22 @@ const flow = (() => {
 
   const toggleRestartBtn = () => {
       const restartBtn = document.getElementById("restart-btn");
-      if (restartBtn.style.display == "block") {
+      if (restartBtn.style.display == "inline-block") {
         restartBtn.style.display = "none";
         restartBtn.removeEventListener('click', restartGame);
       } else {
-        restartBtn.style.display = "block";
+        restartBtn.style.display = "inline-block";
         restartBtn.addEventListener('click', restartGame);
       }
   }
 
   const toggleNewGameBtn = () => {
       const newGameBtn = document.getElementById("new-game-btn");
-      if (newGameBtn.style.display == "block") {
+      if (newGameBtn.style.display == "inline-block") {
         newGameBtn.style.display = "none";
         newGameBtn.removeEventListener('click', startNewGame);
       } else {
-        newGameBtn.style.display = "block";
+        newGameBtn.style.display = "inline-block";
         newGameBtn.addEventListener('click', startNewGame);
       }
   }
