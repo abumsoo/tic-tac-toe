@@ -204,22 +204,32 @@ const flow = (() => {
     singlePlayerBtn.addEventListener('click', startSinglePlayer);
     const multiPlayerBtn = document.getElementById('multi-btn');
     multiPlayerBtn.addEventListener('click', startMultiPlayer);
+
+    // multiplayer listeners
     const beginBtn = document.getElementById('begin-btn');
     beginBtn.addEventListener('click', () => {
+      document.querySelector('.name-menu-multi').style.display = "none";
+      beginBtn.style.display = "none";
       const p1 = document.getElementById("p1");
       const p2 = document.getElementById("p2");
+      document.getElementById("p1-info").innerText = `X: ${p1.value}`;
+      document.getElementById("p2-info").innerText = `O: ${p2.value}`;
       p1.readOnly = true;
       p2.readOnly = true;
       _p1 = Player(p1.value, "X", true);
       _p2 = Player(p2.value, "O", false);
       _startGame();
     });
+
+    // singleplayer
     const continueBtn = document.getElementById('continue-btn');
     continueBtn.addEventListener('click', () => {
       const nameInput = document.getElementById("name");
       // set _p1 data values
       roleSelect(nameInput.value);
     });
+
+    // singleplayer
     const x = document.getElementById("xrole");
     x.addEventListener('click', () => {
       _p1 = Player(name, "X", true);
@@ -237,6 +247,7 @@ const flow = (() => {
   const startMultiPlayer = () => {
     document.querySelector(".main-menu").style.display = "none";
     document.querySelector(".name-menu-multi").style.display = "flex";
+    document.querySelector("#begin-btn").style.display = "block";
   }
 
   const startSinglePlayer = () => {
@@ -299,7 +310,6 @@ const flow = (() => {
   }
 
   const restartGame = () => {
-    // moving draw board stuff
     // clear the board
     gameboard.clearBoard();
     toggleRestartBtn();
@@ -391,6 +401,7 @@ const flow = (() => {
     document.getElementById('p2').readOnly = false;
     document.getElementById('name').value = "";
     document.querySelector('.name-menu-multi').style.display = "none";
+    document.querySelector('.player-info').style.display = "none";
     document.querySelector('.board').style.display = "none";
     document.querySelector('.main-menu').style.display = "block";
   };
