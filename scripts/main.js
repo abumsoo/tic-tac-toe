@@ -204,38 +204,22 @@ const flow = (() => {
     singlePlayerBtn.addEventListener('click', startSinglePlayer);
     const multiPlayerBtn = document.getElementById('multi-btn');
     multiPlayerBtn.addEventListener('click', startMultiPlayer);
-  }
-
-  const startMultiPlayer = () => {
-    document.querySelector(".main-menu").style.display = "none";
-    document.querySelector(".name-menu-multi").style.display = "flex";
-    const p1 = document.getElementById("p1");
-    const p2 = document.getElementById("p2");
     const beginBtn = document.getElementById('begin-btn');
     beginBtn.addEventListener('click', () => {
+      const p1 = document.getElementById("p1");
+      const p2 = document.getElementById("p2");
       p1.readOnly = true;
       p2.readOnly = true;
       _p1 = Player(p1.value, "X", true);
       _p2 = Player(p2.value, "O", false);
       _startGame();
     });
-  }
-
-  const startSinglePlayer = () => {
-    const mainMenu = document.querySelector(".main-menu");
-    mainMenu.style.display = "none";
-    document.querySelector(".name-menu").style.display = "flex";
-    const nameInput = document.getElementById("name");
     const continueBtn = document.getElementById('continue-btn');
     continueBtn.addEventListener('click', () => {
+      const nameInput = document.getElementById("name");
       // set _p1 data values
       roleSelect(nameInput.value);
     });
-  }
-
-  const roleSelect = (name) => {
-    document.querySelector(".name-menu").style.display = "none";
-    document.querySelector(".role-menu").style.display = "flex";
     const x = document.getElementById("xrole");
     x.addEventListener('click', () => {
       _p1 = Player(name, "X", true);
@@ -248,6 +232,22 @@ const flow = (() => {
       _p2 = Player(name, "O", false);
       _startGame();
     });
+  }
+
+  const startMultiPlayer = () => {
+    document.querySelector(".main-menu").style.display = "none";
+    document.querySelector(".name-menu-multi").style.display = "flex";
+  }
+
+  const startSinglePlayer = () => {
+    const mainMenu = document.querySelector(".main-menu");
+    mainMenu.style.display = "none";
+    document.querySelector(".name-menu").style.display = "flex";
+  }
+
+  const roleSelect = (name) => {
+    document.querySelector(".name-menu").style.display = "none";
+    document.querySelector(".role-menu").style.display = "flex";
   }
 
   const _startGame = () => {
@@ -269,6 +269,9 @@ const flow = (() => {
 
   const action = (e) => {
     const index = Number(e.target.getAttribute('data-index'));
+    if (!gameboard.indexEmpty(index)) {
+      return;
+    }
     let currPlayer = {};
     let nextPlayer = {};
     if (_p1.isNext()) {
@@ -314,11 +317,7 @@ const flow = (() => {
   const _playerAction = (index, player, nextPlayer) => {
 
     // update boardArray
-    if (gameboard.indexEmpty(index)) {
-      gameboard.updateBoard(index, player.getRole());
-    } else {
-      return;
-    }
+    gameboard.updateBoard(index, player.getRole());
     // toggle next on both players
     if (player.isNext()) {
       player.toggleNext();
@@ -383,6 +382,8 @@ const flow = (() => {
     gameboard.removeListeners();
     toggleRestartBtn();
     toggleNewGameBtn();
+    _p1 = {};
+    _p2 = {};
     document.getElementById('gg-message').innerText = "";
     document.getElementById('p1').value = "";
     document.getElementById('p1').readOnly = false;
