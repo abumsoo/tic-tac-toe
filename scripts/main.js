@@ -144,22 +144,9 @@ const gameboard = (() => {
     }
   }
 
-  const isBoardFull = () => {
-    for (let i = 0; i < _boardArray.length; i++) {
-      if (_boardArray[i] === "") {
-        return false;
-      }
-    }
-    return true;
-  }
+  const isBoardFull = () => !_boardArray.some(element => element === "");
 
-  const indexEmpty = (index) => {
-    if (_boardArray[index] === "") {
-      return true;
-    } else {
-      return false;
-    }
-  }
+  const indexEmpty = (index) => _boardArray[index] === "";
 
   const removeListeners = () => {
     const cells = document.querySelectorAll('.grid-item');
