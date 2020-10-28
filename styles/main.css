@@ -100,6 +100,10 @@ button:hover {
     align-items: center;
 }
 
+.grid-item:hover {
+    background: silver;
+}
+
 .grid-item[data-index="0"],
 .grid-item[data-index="2"],
 .grid-item[data-index="6"],
