@@ -1,10 +1,17 @@
 body {
-    font-family: Roboto;
+    font-family: Roboto, Open Sans, sans-serif;
     font-size: 16px;
+    background-image: url("../media/pexels-pixabay-262488.jpg");
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
 }
 
 h1 {
     font-size: 3rem;
+    color: white;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 1vh 0;
 }
 
 header {
@@ -26,41 +33,43 @@ label {
 
 input {
     width: 92%;
-    height: 5vh;
+    height: 3rem;
     border: 2px solid black;
     border-radius: 4px;
     margin-top: 4px;
     margin-bottom: 16px;
     padding: 1rem;
     font-size: 1.5rem;
-    box-shadow: 0 2px 4px 2px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px 2px rgba(0, 0, 0, 0.2);
 }
 
 button {
     width: 100%;
-    height: 10vh;
+    height: 5rem;
     margin: 8px 0;
     border: 2px solid black;
     border-radius: 4px;
-    box-shadow: 0 2px 4px 2px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px 2px rgba(0, 0, 0, 0.2);
+    font-size: 1.2rem;
 }
 
 button:hover {
     cursor: pointer;
     background: #e0e0e0;
-    box-shadow: 0 2px 4px 2px rgba(0,0,0,0.5);
+    box-shadow: 0 2px 4px 2px rgba(0, 0, 0, 0.5);
 }
 
-.name-menu-multi, 
-.name-menu, 
-.role-menu, 
-#restart-btn, 
+.name-menu-multi,
+.name-menu,
+.role-menu,
+#restart-btn,
 #new-game-btn {
     display: none;
 }
 
-#restart-btn, #new-game-btn {
-    width: 20%;
+#restart-btn,
+#new-game-btn {
+    width: 49%;
 }
 
 .main-menu {
@@ -68,11 +77,15 @@ button:hover {
     width: 50%;
 }
 
-.name-menu-multi, .name-menu, .role-menu {
+.name-menu-multi,
+.name-menu,
+.role-menu {
     width: 50%;
     flex-direction: column;
     align-items: center;
     margin: 0 auto;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 1rem;
 }
 
 .player-info {
@@ -90,6 +103,7 @@ button:hover {
     grid-template-rows: repeat(3, 150px);
     max-width: 450px;
     margin: 0 auto;
+    background: rgba(128, 128, 128, 0.8)
 }
 
 .grid-item {
@@ -126,4 +140,17 @@ button:hover {
 #gg-message {
     font-size: 1.1rem;
     padding: 8px 0;
+}
+
+#game-end-message {
+    display: none;
+    position: absolute;
+    z-index: 9;
+    margin: auto;
+    padding: 1rem;
+    top: 45vh;
+    right: 0;
+    left: 0;
+    width: 20%;
+    background: rgba(255, 255, 255, 0.8)
 }

@@ -1,5 +1,5 @@
-  // draw the board
-(function() {
+// draw the board
+(function () {
   const board = document.querySelector('.board');
   for (let i = 0; i < 9; i++) {
     let cell = document.createElement("div");
@@ -58,9 +58,9 @@ const Bot = (name, role, next) => {
 const gameboard = (() => {
 
   let _boardArray = [
-    "","","",
-    "","","",
-    "","",""
+    "", "", "",
+    "", "", "",
+    "", "", ""
   ];
 
   const getBoard = () => _boardArray;
@@ -68,6 +68,11 @@ const gameboard = (() => {
   const renderBoard = () => {
     const cells = document.querySelectorAll('.grid-item');
     for (let i = 0; i < _boardArray.length; i++) {
+      if (_boardArray[i] == "X") {
+        cells[i].style.color = "white";
+      } else {
+        cells[i].style.color = "black";
+      }
       cells[i].textContent = _boardArray[i];
     }
   }
@@ -91,9 +96,9 @@ const gameboard = (() => {
   }
 
   const checkRow = (index) => {
-    let row = Math.floor(index/3);
+    let row = Math.floor(index / 3);
     for (let i = 0; i < 3; i++) {
-      if (_boardArray[index] !== _boardArray[row*3+i]) {
+      if (_boardArray[index] !== _boardArray[row * 3 + i]) {
         return false;
       }
     }
@@ -103,7 +108,7 @@ const gameboard = (() => {
   const checkCol = (index) => {
     let col = index % 3;
     for (let i = 0; i < 3; i++) {
-      if (_boardArray[index] !== _boardArray[col+3*i]) {
+      if (_boardArray[index] !== _boardArray[col + 3 * i]) {
         return false;
       }
     }
@@ -113,7 +118,7 @@ const gameboard = (() => {
   const checkDiags = (index) => {
     const leftRightTopBot = () => {
       for (let i = 0; i < 3; i++) {
-        if (_boardArray[index] !== _boardArray[i+3*i]) {
+        if (_boardArray[index] !== _boardArray[i + 3 * i]) {
           return false;
         }
       }
@@ -123,7 +128,7 @@ const gameboard = (() => {
     // 6 4 2
     const leftRightBotTop = () => {
       for (let i = 2; i >= 0; i--) {
-        if (_boardArray[index] !== _boardArray[2*i+2]) {
+        if (_boardArray[index] !== _boardArray[2 * i + 2]) {
           return false;
         }
       }
@@ -275,7 +280,7 @@ const flow = (() => {
     if (_p1.isNext()) {
       currPlayer = _p1;
       nextPlayer = _p2;
-    } else if (_p2.isNext()){
+    } else if (_p2.isNext()) {
       currPlayer = _p2;
       nextPlayer = _p1;
     }
@@ -299,6 +304,8 @@ const flow = (() => {
   const restartGame = () => {
     // clear the board
     gameboard.clearBoard();
+    document.getElementById("game-end-message").style.display = "none";
+    document.getElementById("gg-message").textContent = "";
     toggleRestartBtn();
     toggleNewGameBtn();
 
@@ -309,6 +316,12 @@ const flow = (() => {
       gameboard.addListeners();
     }
 
+  }
+
+  const renderGameEndMsg = () => {
+    document.getElementById("game-end-message").style.display = "block";
+    toggleRestartBtn();
+    toggleNewGameBtn();
   }
 
   const _playerAction = (index, player, nextPlayer) => {
@@ -333,9 +346,8 @@ const flow = (() => {
       if (_p2.isNext()) {
         _p2.toggleNext();
       }
+      renderGameEndMsg();
       showWinner(player);
-      toggleRestartBtn();
-      toggleNewGameBtn();
     } else if (gameboard.isBoardFull()) {
       if (!_p1.isNext()) {
         _p1.toggleNext();
@@ -343,35 +355,34 @@ const flow = (() => {
       if (_p2.isNext()) {
         _p2.toggleNext();
       }
+      renderGameEndMsg();
       showTie();
-      toggleRestartBtn();
-      toggleNewGameBtn();
     } else if (nextPlayer.getPlayerType() === 'bot') {
       gameboard.removeListeners();
-      setTimeout(botAction, 650, nextPlayer, player);
+      setTimeout(botAction, 750, nextPlayer, player);
     }
   };
 
   const toggleRestartBtn = () => {
-      const restartBtn = document.getElementById("restart-btn");
-      if (restartBtn.style.display == "inline-block") {
-        restartBtn.style.display = "none";
-        restartBtn.removeEventListener('click', restartGame);
-      } else {
-        restartBtn.style.display = "inline-block";
-        restartBtn.addEventListener('click', restartGame);
-      }
+    const restartBtn = document.getElementById("restart-btn");
+    if (restartBtn.style.display == "inline-block") {
+      restartBtn.style.display = "none";
+      restartBtn.removeEventListener('click', restartGame);
+    } else {
+      restartBtn.style.display = "inline-block";
+      restartBtn.addEventListener('click', restartGame);
+    }
   }
 
   const toggleNewGameBtn = () => {
-      const newGameBtn = document.getElementById("new-game-btn");
-      if (newGameBtn.style.display == "inline-block") {
-        newGameBtn.style.display = "none";
-        newGameBtn.removeEventListener('click', startNewGame);
-      } else {
-        newGameBtn.style.display = "inline-block";
-        newGameBtn.addEventListener('click', startNewGame);
-      }
+    const newGameBtn = document.getElementById("new-game-btn");
+    if (newGameBtn.style.display == "inline-block") {
+      newGameBtn.style.display = "none";
+      newGameBtn.removeEventListener('click', startNewGame);
+    } else {
+      newGameBtn.style.display = "inline-block";
+      newGameBtn.addEventListener('click', startNewGame);
+    }
   }
 
   const startNewGame = () => {
@@ -381,6 +392,7 @@ const flow = (() => {
     toggleNewGameBtn();
     _p1 = {};
     _p2 = {};
+    document.getElementById("game-end-message").style.display = "none";
     document.getElementById('gg-message').innerText = "";
     document.getElementById('p1').value = "";
     document.getElementById('p1').readOnly = false;
@@ -401,7 +413,7 @@ const flow = (() => {
     let indexHash = {};
     // loop through each index in the board
     do {
-      index = Math.floor(Math.random()*9);
+      index = Math.floor(Math.random() * 9);
       if (!(index in indexHash)) {
         // check if the cell is empty
         if (gameboard.indexEmpty(index)) {
@@ -426,7 +438,7 @@ const flow = (() => {
 
     // render the board
     gameboard.renderBoard();
-    
+
     // toggle who's next
     _p1.toggleNext();
     _p2.toggleNext();
@@ -438,9 +450,8 @@ const flow = (() => {
       if (_p2.isNext()) {
         _p2.toggleNext();
       }
+      renderGameEndMsg();
       showWinner(bot);
-      toggleRestartBtn();
-      toggleNewGameBtn();
     } else if (gameboard.isBoardFull()) {
       if (!_p1.isNext()) {
         _p1.toggleNext();
@@ -448,9 +459,8 @@ const flow = (() => {
       if (_p2.isNext()) {
         _p2.toggleNext();
       }
+      renderGameEndMsg();
       showTie();
-      toggleRestartBtn();
-      toggleNewGameBtn();
     } else {
       gameboard.addListeners();
     }
