@@ -1,62 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="styles/reset.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="styles/main.css" type="text/css" media="screen" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.0" />
+    <title>Bum Soo Kim</title>
   </head>
-
   <body>
-
-    <header>
-      <h1>Tic-tac-toe</h1>
-    </header>
-
-    <div class="container">
-
-      <div class="main-menu">
-        <button type="button" id="single-btn">Single player</button>
-        <button type="button" id="multi-btn">Multi player</button>
-      </div>
-
-      <div class="name-menu">
-        <label for="name">Name: </label>
-        <input id="name" type="text" name="name" placeholder="Enter name">
-        <button id="continue-btn">Continue</button>
-      </div>
-
-      <div class="name-menu-multi">
-        <label for="p1">Name for X: </label>
-        <input id="p1" type="text" name="p1" placeholder="Enter name for X">
-        <label for="p2">Name for O: </label>
-        <input id="p2" type="text" name="p2" placeholder="Enter name for O">
-        <button id="begin-btn">Begin</button>
-      </div>
-
-      <div class="role-menu">
-        <p>Enter your role</p>
-        <button id="xrole">X</button>
-        <button id="orole">O</button>
-      </div>
-
-      <div class="player-info">
-        <p id="p1-info"></p>
-        <p id="p2-info"></p>
-      </div>
-
-      <div class="board">
-      </div>
-
-      <div id="game-end-message">
-        <p id="gg-message"></p>
-        <button type="button" id="restart-btn">Rematch</button>
-        <button type="button" id="new-game-btn">New game</button>
-      </div>
-
-    </div>
-
-    <script type="text/javascript" src="scripts/main.js"></script>
-
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
