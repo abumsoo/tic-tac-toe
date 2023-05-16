@@ -1,0 +1,2 @@
+- [ ] a way to assign role to the player
+- [ ]
