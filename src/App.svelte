@@ -3,36 +3,41 @@
   import Board from "./components/Board.svelte";
   import Header from "./components/Header.svelte";
 
-  let displayState = {
+  let state: {
+    showRoleSelect: boolean;
+    showLandingPage: boolean;
+    showBoard: boolean;
+    playerRole: "X" | "O" | undefined;
+  } = {
     showRoleSelect: false,
     showLandingPage: true,
     showBoard: false,
+    playerRole: undefined,
   };
 
-  let playerRole: "X" | "O" | undefined;
-
   function renderRoleSelect() {
-    displayState.showRoleSelect = true;
-    displayState.showLandingPage = false;
+    state.showRoleSelect = true;
+    state.showLandingPage = false;
   }
 </script>
 
 <Header />
 <main>
-  {#if displayState.showLandingPage}
+  {#if state.showLandingPage}
     <h1>Tic Tac Toe</h1>
     <button on:click={renderRoleSelect}><h2>1 player</h2></button>
     <button><h2>2 player</h2></button>
   {/if}
 
-  {#if displayState.showRoleSelect}
-    <RoleSelector bind:role={playerRole} bind:state={displayState} />
+  {#if state.showRoleSelect}
+    <RoleSelector bind:state />
   {/if}
 
-  {#if displayState.showBoard}
-    {console.log(playerRole)}
-    <Board />
+  {#if state.showBoard}
+    <Board playerRole={state.playerRole} />
   {/if}
+
+  <button on:click={() => console.log(state.playerRole)}>playerRole</button>
 </main>
 
 <style>

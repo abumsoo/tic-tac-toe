@@ -1,16 +1,17 @@
 <script>
-  export let role;
   export let state;
 
-  function setX() {
-    role = "X";
+  function startGame() {
     state.showRoleSelect = false;
     state.showBoard = true;
   }
+  function setX() {
+    state.playerRole = "X";
+    startGame();
+  }
   function setO() {
-    role = "O";
-    state.showRoleSelect = false;
-    state.showBoard = true;
+    state.playerRole = "O";
+    startGame();
   }
 </script>
 
