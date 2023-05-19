@@ -1,2 +1,8 @@
-- [ ] a way to assign role to the player
-- [ ]
+- [X] a way to assign role to the player
+- [X] make cells selectable
+- [ ] Make it all keyboard accessible
+- [X] Add game winning conditions
+- [X] Add bot
+- [X] Write minimax function
+- [X] add a toggle for single vs two players
+- [X] Make it work so that player can pick O and have the bot start

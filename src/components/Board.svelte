@@ -1,7 +1,9 @@
 <script lang="ts">
-  export let playerRole;
-  let selections: string[] = new Array(9).fill("a");
+  export let playerRole: "X" | "O" | undefined;
+  export let mode: "single" | "multi";
+  export let selections: string[];
   let gameOver: boolean = false;
+  let tie: boolean = false;
 
   function switchRole() {
     if (playerRole === "X") {
@@ -11,36 +13,138 @@
     }
   }
 
-  function selectTile(index: number) {
-    selections[index] = playerRole;
-    if (checkRow(index) || checkCol(index)) {
+  function selectTile(tile: number) {
+    selections[tile] = playerRole;
+    if (
+      areRowTilesEqual(selections, tile) ||
+      areColTilesEqual(selections, tile) ||
+      areDiagTilesEqual(selections, tile)
+    ) {
       gameOver = true;
+    } else if (isBoardFull(selections)) {
+      gameOver = true;
+      tie = true;
     } else {
       switchRole();
+      if (mode === "single") {
+        let maxEval = -Infinity;
+        let boardClone = [...selections];
+        let targetIndex: number;
+        for (let i = 0; i < 9; i += 1) {
+          if (boardClone[i] === "") {
+            boardClone[i] = playerRole;
+            const score = minimax(
+              boardClone,
+              i,
+              false,
+              getOppositeRole(playerRole)
+            );
+            boardClone[i] = "";
+            if (score > maxEval) {
+              maxEval = score;
+              targetIndex = i;
+            }
+          }
+        }
+        selections[targetIndex] = playerRole;
+
+        if (
+          areRowTilesEqual(selections, tile) ||
+          areColTilesEqual(selections, tile) ||
+          areDiagTilesEqual(selections, tile)
+        ) {
+          gameOver = true;
+        } else if (isBoardFull(selections)) {
+          gameOver = true;
+          tie = true;
+        }
+        switchRole();
+      }
     }
   }
 
-  function checkRow(index: number): boolean {
-    // determine the range that matters
+  function areRowTilesEqual(board: string[], index: number): boolean {
     const startIndex = Math.floor(index / 3) * 3;
-    // check that all three elements are the same
-    return selections
+    return board
       .slice(startIndex, startIndex + 3)
-      .every((tile, _index, tiles) => tile === tiles[startIndex]);
+      .every((v, i, arr) => v === arr[0]);
   }
 
-  function checkCol(index: number): boolean {
+  function areColTilesEqual(board: string[], index: number): boolean {
     const startIndex = index % 3;
     for (let i = startIndex; i < 9; i += 3) {
-      if (selections[i] !== selections[startIndex]) {
+      if (board[index] !== board[i]) {
         return false;
       }
     }
     return true;
   }
 
-  function checkDiagonal(index: number): boolean {
-    return;
+  function areDiagTilesEqual(board: string[], targetIndex: number): boolean {
+    function checkDiag(diag: number[]) {
+      return diag.every((v, i, arr) => board[v] === board[targetIndex]);
+    }
+
+    const backSlash = [0, 4, 8];
+    const forwardSlash = [2, 4, 6];
+    if (targetIndex === 4) {
+      return checkDiag(backSlash) || checkDiag(forwardSlash);
+    } else if (backSlash.includes(targetIndex)) {
+      return checkDiag(backSlash);
+    } else if (forwardSlash.includes(targetIndex)) {
+      return checkDiag(forwardSlash);
+    } else {
+      return false;
+    }
+  }
+
+  function isBoardFull(board: string[]): boolean {
+    return !board.includes("");
+  }
+
+  function getOppositeRole(role: "X" | "O") {
+    return role === "X" ? "O" : "X";
+  }
+
+  function minimax(
+    board: string[],
+    tile: number,
+    maximizer: boolean,
+    role: "X" | "O"
+  ) {
+    if (
+      areColTilesEqual(board, tile) ||
+      areRowTilesEqual(board, tile) ||
+      areDiagTilesEqual(board, tile)
+    ) {
+      return maximizer ? -1 : 1;
+    } else if (isBoardFull(board)) {
+      return 0;
+    }
+
+    if (maximizer) {
+      let maxEval = -Infinity;
+      for (let i = 0; i < 9; i += 1) {
+        if (board[i] === "") {
+          board[i] = role;
+          const score = minimax(board, i, false, getOppositeRole(role));
+          board[i] = "";
+          maxEval = Math.max(score, maxEval);
+        }
+      }
+      return maxEval;
+    } else {
+      let minEval = Infinity;
+      for (let i = 0; i < 9; i += 1) {
+        if (board[i] === "") {
+          board[i] = role;
+          const score = minimax(board, i, true, getOppositeRole(role));
+          board[i] = "";
+          minEval = Math.min(score, minEval);
+        }
+      }
+      return minEval;
+    }
   }
 </script>
 
@@ -69,7 +173,9 @@
     <button on:click={() => selectTile(8)} class="tile">{selections[8]}</button>
   </div>
 </div>
-{#if gameOver}
+{#if tie}
+  <p>Tie</p>
+{:else if gameOver}
   <p>{playerRole} wins!</p>
 {/if}
 

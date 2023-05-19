@@ -8,16 +8,28 @@
     showLandingPage: boolean;
     showBoard: boolean;
     playerRole: "X" | "O" | undefined;
+    mode: "single" | "multi" | undefined;
+    selections: string[];
   } = {
     showRoleSelect: false,
     showLandingPage: true,
     showBoard: false,
     playerRole: undefined,
+    mode: undefined,
+    selections: new Array(9).fill(""),
   };
 
-  function renderRoleSelect() {
-    state.showRoleSelect = true;
+  function startSinglePlayer() {
+    state.mode = "single";
     state.showLandingPage = false;
+    state.showRoleSelect = true;
+  }
+
+  function start2Player() {
+    state.mode = "multi";
+    state.showLandingPage = false;
+    state.showBoard = true;
+    state.playerRole = "X";
   }
 </script>
 
@@ -25,8 +37,8 @@
 <main>
   {#if state.showLandingPage}
     <h1>Tic Tac Toe</h1>
-    <button on:click={renderRoleSelect}><h2>1 player</h2></button>
-    <button><h2>2 player</h2></button>
+    <button on:click={startSinglePlayer}><h2>1 player</h2></button>
+    <button on:click={start2Player}><h2>2 player</h2></button>
   {/if}
 
   {#if state.showRoleSelect}
@@ -34,10 +46,12 @@
   {/if}
 
   {#if state.showBoard}
-    <Board playerRole={state.playerRole} />
+    <Board
+      playerRole={state.playerRole}
+      mode={state.mode}
+      selections={state.selections}
+    />
   {/if}
-
-  <button on:click={() => console.log(state.playerRole)}>playerRole</button>
 </main>
 
 <style>

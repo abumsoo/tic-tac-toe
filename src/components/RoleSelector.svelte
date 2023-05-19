@@ -11,6 +11,7 @@
   }
   function setO() {
     state.playerRole = "O";
+    state.selections[4] = "X";
     startGame();
   }
 </script>
