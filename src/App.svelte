@@ -33,12 +33,14 @@
   }
 </script>
 
-<Header />
+<Header {state} />
 <main>
   {#if state.showLandingPage}
     <h1>Tic Tac Toe</h1>
-    <button on:click={startSinglePlayer}><h2>1 player</h2></button>
-    <button on:click={start2Player}><h2>2 player</h2></button>
+    <div class="buttons">
+      <button on:click={startSinglePlayer}>1 player</button>
+      <button on:click={start2Player}>2 player</button>
+    </div>
   {/if}
 
   {#if state.showRoleSelect}
@@ -55,4 +57,29 @@
 </main>
 
 <style>
+  main {
+    text-align: center;
+  }
+  h1 {
+    font-size: 72px;
+  }
+  button {
+    width: 300px;
+    height: 40px;
+    font-size: 24px;
+    background: #2a5965;
+    border: 2px solid rgba(253, 242, 237, 1);
+    border-radius: 5px;
+    color: rgba(253, 242, 237, 1);
+  }
+  button:hover {
+    cursor: pointer;
+    background: rgba(62, 89, 101);
+  }
+  .buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
 </style>
