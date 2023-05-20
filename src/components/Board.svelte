@@ -14,13 +14,40 @@
     }
   }
 
+  function winner(board: string[], tile: number) {
+    return (
+      areRowTilesEqual(board, tile) ||
+      areColTilesEqual(board, tile) ||
+      areDiagTilesEqual(board, tile)
+    );
+  }
+
+  function getBotMove() {
+    let maxEval = -Infinity;
+    let boardClone = [...selections];
+    let targetIndex: number;
+    for (let i = 0; i < 9; i += 1) {
+      if (boardClone[i] === "") {
+        boardClone[i] = playerRole;
+        const score = minimax(
+          boardClone,
+          i,
+          false,
+          getOppositeRole(playerRole)
+        );
+        boardClone[i] = "";
+        if (score > maxEval) {
+          maxEval = score;
+          targetIndex = i;
+        }
+      }
+    }
+    return targetIndex;
+  }
+
   function selectTile(tile: number) {
     selections[tile] = playerRole;
-    if (
-      areRowTilesEqual(selections, tile) ||
-      areColTilesEqual(selections, tile) ||
-      areDiagTilesEqual(selections, tile)
-    ) {
+    if (winner(selections, tile)) {
       winLose = true;
     } else if (isBoardFull(selections)) {
       winLose = true;
@@ -28,32 +55,9 @@
     } else {
       switchRole();
       if (mode === "single") {
-        let maxEval = -Infinity;
-        let boardClone = [...selections];
-        let targetIndex: number;
-        for (let i = 0; i < 9; i += 1) {
-          if (boardClone[i] === "") {
-            boardClone[i] = playerRole;
-            const score = minimax(
-              boardClone,
-              i,
-              false,
-              getOppositeRole(playerRole)
-            );
-            boardClone[i] = "";
-            if (score > maxEval) {
-              maxEval = score;
-              targetIndex = i;
-            }
-          }
-        }
-        selections[targetIndex] = playerRole;
-
-        if (
-          areRowTilesEqual(selections, targetIndex) ||
-          areColTilesEqual(selections, targetIndex) ||
-          areDiagTilesEqual(selections, targetIndex)
-        ) {
+        const botMove = getBotMove();
+        selections[botMove] = playerRole;
+        if (winner(selections, botMove)) {
           winLose = true;
         } else if (isBoardFull(selections)) {
           winLose = true;
@@ -83,18 +87,18 @@
   }
 
   function areDiagTilesEqual(board: string[], targetIndex: number): boolean {
-    function checkDiag(diag: number[]) {
+    function checkDiagonal(diag: number[]) {
       return diag.every((v, i, arr) => board[v] === board[targetIndex]);
     }
 
     const backSlash = [0, 4, 8];
     const forwardSlash = [2, 4, 6];
     if (targetIndex === 4) {
-      return checkDiag(backSlash) || checkDiag(forwardSlash);
+      return checkDiagonal(backSlash) || checkDiagonal(forwardSlash);
     } else if (backSlash.includes(targetIndex)) {
-      return checkDiag(backSlash);
+      return checkDiagonal(backSlash);
     } else if (forwardSlash.includes(targetIndex)) {
-      return checkDiag(forwardSlash);
+      return checkDiagonal(forwardSlash);
     } else {
       return false;
     }
@@ -114,11 +118,7 @@
     maximizer: boolean,
     role: "X" | "O"
   ) {
-    if (
-      areColTilesEqual(board, tile) ||
-      areRowTilesEqual(board, tile) ||
-      areDiagTilesEqual(board, tile)
-    ) {
+    if (winner(board, tile)) {
       return maximizer ? -1 : 1;
     } else if (isBoardFull(board)) {
       return 0;
