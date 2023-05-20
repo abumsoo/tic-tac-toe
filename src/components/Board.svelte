@@ -148,12 +148,17 @@
       return minEval;
     }
   }
+  let tileHover = false;
 </script>
 
 <div class="board">
   <div class="row">
-    <button on:click={gameOver ? () => {} : () => selectTile(0)} class="tile"
-      >{selections[0]}</button
+    <button
+      on:mouseenter={() => (tileHover = true)}
+      on:mouseleave={() => (tileHover = false)}
+      on:click={gameOver ? () => {} : () => selectTile(0)}
+      class="tile"
+      >{selections[0] === "" && tileHover ? playerRole : selections[0]}</button
     >
     <div class="column top-col" />
     <button on:click={gameOver ? () => {} : () => selectTile(1)} class="tile"
@@ -206,6 +211,7 @@
     grid-template-columns: auto;
     width: 500px;
     height: 500px;
+    margin: 0 auto;
   }
 
   .row {
@@ -217,17 +223,18 @@
     min-width: 100px;
     min-height: 100px;
     border: 0;
-    background: white;
-    color: black;
+    color: rgba(253, 242, 237, 1);
+    font-size: 128px;
+    font-weight: 200;
   }
 
   .column {
-    background-color: red;
+    background: rgba(239, 204, 210, 1);
     min-width: 10px;
   }
 
   .row-separator {
-    background-color: green;
+    background: rgba(239, 204, 210, 1);
     min-height: 10px;
     border-radius: 8px;
   }

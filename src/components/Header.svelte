@@ -1,5 +1,18 @@
+<script>
+  export let state;
+</script>
+
 <header>
-  <button>Back</button>
-  <button>Main Menu</button>
-  <button>Restart</button>
+  <button
+    on:click={() => {
+      state.showLandingPage = true;
+      state.showBoard = false;
+      state.showRoleSelect = false;
+    }}>Main Menu</button
+  >
+  <button
+    on:click={() => {
+      state.selections = new Array(9).fill("");
+    }}>Restart</button
+  >
 </header>
