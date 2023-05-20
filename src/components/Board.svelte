@@ -2,8 +2,9 @@
   export let playerRole: "X" | "O" | undefined;
   export let mode: "single" | "multi";
   export let selections: string[];
-  let gameOver: boolean = false;
+  let winLose: boolean = false;
   let tie: boolean = false;
+  let gameOver = winLose || tie;
 
   function switchRole() {
     if (playerRole === "X") {
@@ -20,9 +21,9 @@
       areColTilesEqual(selections, tile) ||
       areDiagTilesEqual(selections, tile)
     ) {
-      gameOver = true;
+      winLose = true;
     } else if (isBoardFull(selections)) {
-      gameOver = true;
+      winLose = true;
       tie = true;
     } else {
       switchRole();
@@ -49,16 +50,17 @@
         selections[targetIndex] = playerRole;
 
         if (
-          areRowTilesEqual(selections, tile) ||
-          areColTilesEqual(selections, tile) ||
-          areDiagTilesEqual(selections, tile)
+          areRowTilesEqual(selections, targetIndex) ||
+          areColTilesEqual(selections, targetIndex) ||
+          areDiagTilesEqual(selections, targetIndex)
         ) {
-          gameOver = true;
+          winLose = true;
         } else if (isBoardFull(selections)) {
-          gameOver = true;
+          winLose = true;
           tie = true;
+        } else {
+          switchRole();
         }
-        switchRole();
       }
     }
   }
@@ -150,32 +152,50 @@
 
 <div class="board">
   <div class="row">
-    <button on:click={() => selectTile(0)} class="tile">{selections[0]}</button>
+    <button on:click={gameOver ? () => {} : () => selectTile(0)} class="tile"
+      >{selections[0]}</button
+    >
     <div class="column top-col" />
-    <button on:click={() => selectTile(1)} class="tile">{selections[1]}</button>
+    <button on:click={gameOver ? () => {} : () => selectTile(1)} class="tile"
+      >{selections[1]}</button
+    >
     <div class="column top-col" />
-    <button on:click={() => selectTile(2)} class="tile">{selections[2]}</button>
+    <button on:click={gameOver ? () => {} : () => selectTile(2)} class="tile"
+      >{selections[2]}</button
+    >
   </div>
   <div class="row-separator" />
   <div class="row">
-    <button on:click={() => selectTile(3)} class="tile">{selections[3]}</button>
+    <button on:click={gameOver ? () => {} : () => selectTile(3)} class="tile"
+      >{selections[3]}</button
+    >
     <div class="column" />
-    <button on:click={() => selectTile(4)} class="tile">{selections[4]}</button>
+    <button on:click={gameOver ? () => {} : () => selectTile(4)} class="tile"
+      >{selections[4]}</button
+    >
     <div class="column" />
-    <button on:click={() => selectTile(5)} class="tile">{selections[5]}</button>
+    <button on:click={gameOver ? () => {} : () => selectTile(5)} class="tile"
+      >{selections[5]}</button
+    >
   </div>
   <div class="row-separator" />
   <div class="row">
-    <button on:click={() => selectTile(6)} class="tile">{selections[6]}</button>
+    <button on:click={gameOver ? () => {} : () => selectTile(6)} class="tile"
+      >{selections[6]}</button
+    >
     <div class="column bot-col" />
-    <button on:click={() => selectTile(7)} class="tile">{selections[7]}</button>
+    <button on:click={gameOver ? () => {} : () => selectTile(7)} class="tile"
+      >{selections[7]}</button
+    >
     <div class="column bot-col" />
-    <button on:click={() => selectTile(8)} class="tile">{selections[8]}</button>
+    <button on:click={gameOver ? () => {} : () => selectTile(8)} class="tile"
+      >{selections[8]}</button
+    >
   </div>
 </div>
 {#if tie}
   <p>Tie</p>
-{:else if gameOver}
+{:else if winLose}
   <p>{playerRole} wins!</p>
 {/if}
 
