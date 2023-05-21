@@ -153,6 +153,11 @@
   let tileHover = false;
 </script>
 
+{#if tie}
+  <h2>Tie</h2>
+{:else if winLose}
+  <h2>{playerRole} wins!</h2>
+{/if}
 <div class="board">
   <div class="row">
     <button
@@ -207,6 +212,10 @@
 {/if}
 
 <style>
+  h2 {
+    font-size: 36px;
+    font-weight: 400;
+  }
   .board {
     display: grid;
     grid-template-rows: 1fr 10px 1fr 10px 1fr;
