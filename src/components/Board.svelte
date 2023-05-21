@@ -1,4 +1,6 @@
 <script lang="ts">
+  import Tile from "./Tile.svelte";
+
   export let playerRole: "X" | "O" | undefined;
   export let mode: "single" | "multi";
   export let selections: string[];
@@ -57,15 +59,15 @@
       if (mode === "single") {
         const botMove = getBotMove();
         setTimeout(() => {
-        selections[botMove] = playerRole;
-        if (winner(selections, botMove)) {
-          winLose = true;
-        } else if (isBoardFull(selections)) {
-          winLose = true;
-          tie = true;
-        } else {
-          switchRole();
-        }
+          selections[botMove] = playerRole;
+          if (winner(selections, botMove)) {
+            winLose = true;
+          } else if (isBoardFull(selections)) {
+            winLose = true;
+            tie = true;
+          } else {
+            switchRole();
+          }
         }, 600);
       }
     }
@@ -150,7 +152,6 @@
       return minEval;
     }
   }
-  let tileHover = false;
 </script>
 
 {#if tie}
@@ -160,56 +161,83 @@
 {/if}
 <div class="board">
   <div class="row">
-    <button
-      on:mouseenter={() => (tileHover = true)}
-      on:mouseleave={() => (tileHover = false)}
-      on:click={gameOver ? () => {} : () => selectTile(0)}
-      class="tile"
-      >{selections[0] === "" && tileHover ? playerRole : selections[0]}</button
-    >
+    <Tile
+      {gameOver}
+      tileSelectHandler={() => selectTile(0)}
+      {playerRole}
+      {selections}
+      tilePosition={0}
+    />
     <div class="column top-col" />
-    <button on:click={gameOver ? () => {} : () => selectTile(1)} class="tile"
-      >{selections[1]}</button
-    >
+    <Tile
+      {gameOver}
+      tileSelectHandler={() => selectTile(1)}
+      {playerRole}
+      {selections}
+      tilePosition={1}
+    />
     <div class="column top-col" />
-    <button on:click={gameOver ? () => {} : () => selectTile(2)} class="tile"
-      >{selections[2]}</button
-    >
+    <Tile
+      {gameOver}
+      tileSelectHandler={() => selectTile(2)}
+      {playerRole}
+      {selections}
+      tilePosition={2}
+    />
   </div>
   <div class="row-separator" />
   <div class="row">
-    <button on:click={gameOver ? () => {} : () => selectTile(3)} class="tile"
-      >{selections[3]}</button
-    >
+    <Tile
+      {gameOver}
+      tileSelectHandler={() => selectTile(3)}
+      {playerRole}
+      {selections}
+      tilePosition={3}
+    />
     <div class="column" />
-    <button on:click={gameOver ? () => {} : () => selectTile(4)} class="tile"
-      >{selections[4]}</button
-    >
+    <Tile
+      {gameOver}
+      tileSelectHandler={() => selectTile(4)}
+      {playerRole}
+      {selections}
+      tilePosition={4}
+    />
     <div class="column" />
-    <button on:click={gameOver ? () => {} : () => selectTile(5)} class="tile"
-      >{selections[5]}</button
-    >
+    <Tile
+      {gameOver}
+      tileSelectHandler={() => selectTile(5)}
+      {playerRole}
+      {selections}
+      tilePosition={5}
+    />
   </div>
   <div class="row-separator" />
   <div class="row">
-    <button on:click={gameOver ? () => {} : () => selectTile(6)} class="tile"
-      >{selections[6]}</button
-    >
+    <Tile
+      {gameOver}
+      tileSelectHandler={() => selectTile(6)}
+      {playerRole}
+      {selections}
+      tilePosition={6}
+    />
     <div class="column bot-col" />
-    <button on:click={gameOver ? () => {} : () => selectTile(7)} class="tile"
-      >{selections[7]}</button
-    >
+    <Tile
+      {gameOver}
+      tileSelectHandler={() => selectTile(7)}
+      {playerRole}
+      {selections}
+      tilePosition={7}
+    />
     <div class="column bot-col" />
-    <button on:click={gameOver ? () => {} : () => selectTile(8)} class="tile"
-      >{selections[8]}</button
-    >
+    <Tile
+      {gameOver}
+      tileSelectHandler={() => selectTile(8)}
+      {playerRole}
+      {selections}
+      tilePosition={8}
+    />
   </div>
 </div>
-{#if tie}
-  <p>Tie</p>
-{:else if winLose}
-  <p>{playerRole} wins!</p>
-{/if}
 
 <style>
   h2 {
@@ -228,15 +256,6 @@
   .row {
     display: grid;
     grid-template-columns: 1fr 10px 1fr 10px 1fr;
-  }
-
-  .tile {
-    min-width: 100px;
-    min-height: 100px;
-    border: 0;
-    color: rgba(253, 242, 237, 1);
-    font-size: 128px;
-    font-weight: 200;
   }
 
   .column {
