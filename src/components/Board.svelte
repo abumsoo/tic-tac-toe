@@ -56,6 +56,7 @@
       switchRole();
       if (mode === "single") {
         const botMove = getBotMove();
+        setTimeout(() => {
         selections[botMove] = playerRole;
         if (winner(selections, botMove)) {
           winLose = true;
@@ -65,6 +66,7 @@
         } else {
           switchRole();
         }
+        }, 600);
       }
     }
   }
