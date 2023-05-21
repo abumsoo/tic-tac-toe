@@ -84,7 +84,7 @@ describe("Board", () => {
       let tiles = screen.queryAllByRole('button')
 
       await fireEvent.click(tiles[0])
-
+      await new Promise((r) => setTimeout(r, 1000));
       const tileValues = tiles.map((tile) => tile.innerHTML)
       expect(tileValues).toContain('O');
     })
@@ -93,7 +93,9 @@ describe("Board", () => {
       let tiles = screen.queryAllByRole('button')
 
       await fireEvent.click(tiles[4])
+      await new Promise((r) => setTimeout(r, 1000));
       await fireEvent.click(tiles[6])
+      await new Promise((r) => setTimeout(r, 1000));
 
       expect(tiles[2].innerHTML).toEqual('O')
     })
