@@ -1,12 +1,16 @@
 <script lang="ts">
+  import { gameWin, gameTie } from "../store";
   import Tile from "./Tile.svelte";
 
   export let playerRole: "X" | "O" | undefined;
   export let mode: "single" | "multi";
   export let selections: string[];
-  let winLose: boolean = false;
-  let tie: boolean = false;
-  let gameOver = winLose || tie;
+  let win;
+  let tie;
+  gameWin.subscribe((v) => (win = v));
+  gameTie.subscribe((v) => (tie = v));
+  let gameOver = win || tie;
+  let botsTurn: boolean = false;
 
   function switchRole() {
     if (playerRole === "X") {
@@ -50,24 +54,26 @@
   function selectTile(tile: number) {
     selections[tile] = playerRole;
     if (winner(selections, tile)) {
-      winLose = true;
+      gameWin.set(true);
     } else if (isBoardFull(selections)) {
-      winLose = true;
-      tie = true;
+      gameWin.set(true);
+      gameTie.set(true);
     } else {
       switchRole();
       if (mode === "single") {
+        botsTurn = true;
         const botMove = getBotMove();
         setTimeout(() => {
           selections[botMove] = playerRole;
           if (winner(selections, botMove)) {
-            winLose = true;
+            gameWin.set(true);
           } else if (isBoardFull(selections)) {
-            winLose = true;
-            tie = true;
+            gameWin.set(true);
+            gameTie.set(true);
           } else {
             switchRole();
           }
+          botsTurn = false;
         }, 600);
       }
     }
@@ -156,85 +162,85 @@
 
 {#if tie}
   <h2>Tie</h2>
-{:else if winLose}
+{:else if win}
   <h2>{playerRole} wins!</h2>
 {/if}
 <div class="board">
   <div class="row">
     <Tile
-      {gameOver}
-      tileSelectHandler={() => selectTile(0)}
+      tileSelectHandler={gameOver || botsTurn ? () => {} : () => selectTile(0)}
       {playerRole}
       {selections}
       tilePosition={0}
+      {botsTurn}
     />
     <div class="column top-col" />
     <Tile
-      {gameOver}
-      tileSelectHandler={() => selectTile(1)}
+      tileSelectHandler={gameOver || botsTurn ? () => {} : () => selectTile(1)}
       {playerRole}
       {selections}
       tilePosition={1}
+      {botsTurn}
     />
     <div class="column top-col" />
     <Tile
-      {gameOver}
-      tileSelectHandler={() => selectTile(2)}
+      tileSelectHandler={gameOver || botsTurn ? () => {} : () => selectTile(2)}
       {playerRole}
       {selections}
       tilePosition={2}
+      {botsTurn}
     />
   </div>
   <div class="row-separator" />
   <div class="row">
     <Tile
-      {gameOver}
-      tileSelectHandler={() => selectTile(3)}
+      tileSelectHandler={gameOver || botsTurn ? () => {} : () => selectTile(3)}
       {playerRole}
       {selections}
+      {botsTurn}
       tilePosition={3}
     />
     <div class="column" />
     <Tile
-      {gameOver}
-      tileSelectHandler={() => selectTile(4)}
+      tileSelectHandler={gameOver || botsTurn ? () => {} : () => selectTile(4)}
       {playerRole}
       {selections}
       tilePosition={4}
+      {botsTurn}
     />
     <div class="column" />
     <Tile
-      {gameOver}
-      tileSelectHandler={() => selectTile(5)}
+      tileSelectHandler={gameOver || botsTurn ? () => {} : () => selectTile(5)}
       {playerRole}
       {selections}
       tilePosition={5}
+      {botsTurn}
     />
   </div>
   <div class="row-separator" />
   <div class="row">
     <Tile
-      {gameOver}
-      tileSelectHandler={() => selectTile(6)}
+      tileSelectHandler={gameOver || botsTurn ? () => {} : () => selectTile(6)}
       {playerRole}
       {selections}
       tilePosition={6}
+      {botsTurn}
     />
     <div class="column bot-col" />
     <Tile
-      {gameOver}
-      tileSelectHandler={() => selectTile(7)}
+      tileSelectHandler={gameOver || botsTurn ? () => {} : () => selectTile(7)}
       {playerRole}
       {selections}
       tilePosition={7}
+      {botsTurn}
     />
     <div class="column bot-col" />
     <Tile
-      {gameOver}
-      tileSelectHandler={() => selectTile(8)}
+      tileSelectHandler={gameOver || botsTurn ? () => {} : () => selectTile(8)}
       {playerRole}
       {selections}
       tilePosition={8}
+      {botsTurn}
     />
   </div>
 </div>

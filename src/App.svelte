@@ -33,7 +33,7 @@
   }
 </script>
 
-<Header {state} />
+<Header bind:state />
 <main>
   {#if state.showLandingPage}
     <h1>Tic Tac Toe</h1>
