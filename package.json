@@ -2,6 +2,7 @@
   "name": "tic-tac-toe",
   "private": true,
   "version": "0.0.0",
+  "homepage": "https://abumsoo.github.io/tic-tac-toe",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,13 +10,15 @@
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest run src",
-    "test:watch": "vitest src"
+    "test:watch": "vitest src",
+    "deploy": "gh-pages -d dist"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.0.3",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/svelte": "^3.2.2",
     "@tsconfig/svelte": "^4.0.1",
+    "gh-pages": "^5.0.0",
     "jsdom": "^22.0.0",
     "svelte": "^3.57.0",
     "svelte-check": "^2.10.3",
